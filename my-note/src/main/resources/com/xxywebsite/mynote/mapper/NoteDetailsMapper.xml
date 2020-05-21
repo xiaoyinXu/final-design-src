@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xxywebsite.mynote.mapper.NoteDetailsMapper">
+    <insert id="addNoteDetails" useGeneratedKeys="true" keyProperty="id">
+        insert into note(menu_id, name, content, create_date)
+        values(#{menuId},#{name},#{content},#{createDate})
+    </insert>
+    <delete id="deleteNoteDetails">
+        delete from note
+        <where>
+            and id = #{id}
+        </where>
+
+    </delete>
+    <update id="updateNoteDetails">
+        update note
+        <set>
+            <if test="menuId != 0">
+                menu_id = #{menuId},
+            </if>
+            <if test="#name != null">
+                name = #{name},
+            </if>
+            <if test="#{content} != null">
+                content = #{content},
+            </if>
+            <if test="#createDate != null">
+                create_date = #{createDate},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+    <select id="findNoteDetailsById" resultType="com.xxywebsite.mynote.entity.NoteDetails">
+        select * from note where id = #{id}
+    </select>
+
+    <select id="findNoteDetailsByNoteQueryBean" resultType="com.xxywebsite.mynote.entity.NoteDetails">
+        select *
+        from note
+        <where>
+            <if test="keyword != null and keyword !=''">
+                and ( name like concat('%',#{keyword},'%') or content like concat('%',#{keyword},'%'))
+            </if>
+            <if test="from != null">
+                and create_date >= #{from}
+            </if>
+            <if test="to != null">
+                and create_date &lt;= #{to}
+            </if>
+        </where>
+
+
+    </select>
+</mapper>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xxywebsite.mynote.mapper.MenuMapper">
+    <select id="findMenuById" resultType="com.xxywebsite.mynote.entity.Menu">
+       select * from menu where id = #{id}
+   </select>
+
+<!--    首先查询到一个集合, 然后再查询menus,如果-->
+<!--    查询所有menus等价于 查询parentId等于当前parentId的Menu,然后recursive(Menu.id)-->
+    <resultMap id="menus" type="com.xxywebsite.mynote.entity.Menu">
+
+        <id column="id" property="id" />
+        <result column="parent_id" property="parentId"/>
+        <result column="user_id" property="userId"/>
+        <result column="name" property="name" />
+        <collection property="menus"
+                    select="com.xxywebsite.mynote.mapper.MenuMapper.findMenusByUserIdAndParentId"
+                    column="{userId=user_id,parentId=id}"
+>
+        </collection>
+        <collection property="notes" select="com.xxywebsite.mynote.mapper.NoteMapper.findNotesByMenuId"
+
+                        column="id">
+
+        </collection>
+    </resultMap>
+
+    <select id="findMenusByUserIdAndParentId" resultMap="menus">
+        select * from menu where user_id = #{userId} and parent_id = #{parentId}
+    </select>
+
+    <update id="updateMenu">
+        update menu
+        <set>
+<!--            <if test = "#{id} != 0">-->
+<!--                id = #{id},-->
+<!--            </if>-->
+            <if test="parentId != 0">
+                parent_id = #{parentId},
+            </if>
+--             private int userId;
+--             private String name;
+            <if test="userId != 0">
+                user_id = #{userId},
+            </if>
+            <if test="#{name} != null">
+                name = #{name},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+</mapper>
